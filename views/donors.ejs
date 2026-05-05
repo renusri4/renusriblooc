@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="/style.css">
+
+<div class="sidebar">
+  <h2>Blood Bank</h2>
+  <a href="/">Dashboard</a>
+  <a href="/donors">Donors</a>
+  <a href="/patients">Patients</a>
+</div>
+
+<div class="main">
+  <h2>Donors</h2>
+
+  <form action="/add-donor" method="POST">
+    <input name="name" placeholder="Name" required>
+    <input name="blood" placeholder="Blood Group" required>
+    <button>Add</button>
+  </form>
+
+  <ul>
+    <% donors.forEach((d,i)=>{ %>
+      <li>
+        <%= d.name %> - <%= d.blood %>
+
+        <form action="/delete-donor/<%= i %>" method="POST">
+          <button>Delete</button>
+        </form>
+      </li>
+    <% }) %>
+  </ul>
+</div>

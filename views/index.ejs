@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blood Bank Dashboard</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>🩸 Blood Bank</h2>
+    <a href="/">Dashboard</a>
+    <a href="/donors">Donors</a>
+    <a href="/patients">Patients</a>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+    <h1>Dashboard</h1>
+
+    <!-- ADD INVENTORY -->
+    <div class="card">
+        <h3>Add Inventory</h3>
+        <form action="/add-inventory" method="POST">
+            <input name="blood" placeholder="Blood Group" required>
+            <input name="qty" type="number" placeholder="Quantity" required>
+            <button>Add</button>
+        </form>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="card">
+        <h3>Search Blood</h3>
+        <form action="/search" method="GET">
+            <input name="q" placeholder="Enter blood group">
+            <button>Search</button>
+        </form>
+    </div>
+
+    <!-- INVENTORY TABLE -->
+    <div class="card">
+        <h3>Inventory</h3>
+
+        <table>
+            <tr>
+                <th>Blood</th>
+                <th>Qty</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+
+            <% inventory.forEach((item, i) => { 
+                let status = item.qty <= 10 ? "Critical" : item.qty <= 20 ? "Low" : "Safe";
+                let color = item.qty <= 10 ? "red" : item.qty <= 20 ? "orange" : "green";
+            %>
+
+            <tr>
+                <td><%= item.blood %></td>
+                <td><%= item.qty %></td>
+                <td style="color:<%= color %>"><%= status %></td>
+
+                <td>
+                    <!-- DELETE -->
+                    <form action="/delete-inventory/<%= i %>" method="POST" style="display:inline;">
+                        <button>Delete</button>
+                    </form>
+
+                    <!-- EDIT -->
+                    <form action="/edit-inventory/<%= i %>" method="POST" style="display:inline;">
+                        <input name="blood" value="<%= item.blood %>" required>
+                        <input name="qty" value="<%= item.qty %>" required>
+                        <button>Edit</button>
+                    </form>
+                </td>
+            </tr>
+
+            <% }) %>
+        </table>
+    </div>
+
+    <!-- CHART -->
+    <div class="card">
+        <h3>Blood Stock Chart</h3>
+        <canvas id="chart"></canvas>
+    </div>
+
+</div>
+
+<!-- CHART SCRIPT -->
+<script>
+const data = <%- JSON.stringify(inventory.map(i => i.qty)) %>;
+const labels = <%- JSON.stringify(inventory.map(i => i.blood)) %>;
+
+new Chart(document.getElementById("chart"), {
+    type: "bar",
+    data: {
+        labels: labels,
+        datasets: [{
+            label: "Blood Units",
+            data: data
+        }]
+    }
+});
+</script>
+
+</body>
+</html>
